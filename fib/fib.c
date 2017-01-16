@@ -2,9 +2,9 @@
 static int f1 = 1;
 static int f2 = 0;
 
-int get_next_fib() {
+int get_next() {
 	int t = f2;
-	int f2 = f1 + f2;
+	f2 = f1 + f2;
 	f1 = t;
 	return f2;
 }
