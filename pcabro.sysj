@@ -1,3 +1,35 @@
+reaction FIFO(:input int signal add, output int signal get, output int signal q,
+		output signal empty, output signal full){
+		cfv f,e;
+		loop{
+			abort(get){
+				abort(add){
+					{+ 
+						if(isEmpty() > 0) {
+							sgl_SetCFV(e, TRUE);
+						} else if (isFull() > 0) {
+							sgl_SetCFV(f, TRUE);
+						}
+					+}
+					if(f) {
+						sustain full;
+					} else if (e){
+						sustain empty;
+					} else
+						halt;
+				} do{
+					{+ push(*(int*)sgl_GetSigVal(add)); +}
+				}
+			} do {
+				{+ 
+					int i = pop();
+					sgl_SetSigVal(q, &i);
+				+}
+				emit q;
+			}
+		}
+}
+
 Cabro(input signal A,B,R; output signal O; output int channel C1;)->{
 	loop{
 		abort(R){
@@ -14,12 +46,39 @@ Cabro(input signal A,B,R; output signal O; output int channel C1;)->{
 }
 
 Buffer(input int channel C1; output int channel C2;)->{
-	loop{
-		receive C1;
-		{+
-			int i = *(int*)sgl_GetChanVal(C1);
-			push(i);
-		+}
-		pause;
+	int signal add, q;
+	signal get,empty,full;
+	{
+		loop{
+			receive C1;
+			{+
+				int i = *(int*)sgl_GetChanVal(C1);
+				sgl_SetSigVal(add, &i);
+			+}
+			emit add;
+			pause;
+		}
+	}
+	||
+	FIFO(:add,get,q,empty,full)
+	||
+	{
+		loop{
+			abort(immediate full){
+				await(!empty);
+				emit get;
+				await(q);
+				{+ 
+					int i = *(int*)sgl_GetSigVal(q);
+					sgl_SetChanVal(C2, &i); 
+				+}
+				send C2;
+			}
+			pause;
+		}
 	}
 }
+
+// Pabro(input signal A,B,R; output signal O; input int channel C2;)->{
+
+// }

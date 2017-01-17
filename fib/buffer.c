@@ -1,12 +1,16 @@
 #include <stdio.h>
-static int b[40];
+
+#define SIZE 40
+static int b[SIZE];
 static int* hp = 0;
 
 void push(int i) {
-	if (hp == 0)
-		hp = b;
-	*hp = i;
-	hp++;
+	if(hp - b < SIZE) {
+		if (hp == 0)
+			hp = b;
+		*hp = i;
+		hp++;
+	}
 }
 
 int pop() {
@@ -17,3 +21,10 @@ int pop() {
 	}
 }
 
+int isEmpty() {
+	return hp == b;
+}
+
+int isFull() {
+	return hp == (b + SIZE);
+}
