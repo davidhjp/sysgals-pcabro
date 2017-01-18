@@ -30,7 +30,7 @@ reaction FIFO(:input int signal add, output int signal get, output int signal q,
 		}
 }
 
-Cabro(input signal A,B,R; output signal O; output int channel C1;)->{
+Pabro(input signal A,B,R; output signal O; output int channel C1;)->{
 	loop{
 		abort(R){
 			{await(A);}||{await(B);}
@@ -41,6 +41,19 @@ Cabro(input signal A,B,R; output signal O; output int channel C1;)->{
 			emit O;
 			send C1;
 			halt;
+		}
+	}
+}
+
+Cabro(input signal A,B,R; output signal O; input int channel C2;)->{
+	loop{
+		abort(R){
+			{await(A);}||{await(B);}
+			receive C2;
+			{+
+				int i = *(int*)sgl_GetChanVal(C2);
+				printf("Received : %d\n", i);
+			+}
 		}
 	}
 }

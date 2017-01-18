@@ -5,6 +5,6 @@ all:
 	gcc -I. fib/*.c *.c 
 
 clean:
-	rm -rf *.c a.out *.h
+	rm -rf *.c a.out *.h *.class *.java
 
 
