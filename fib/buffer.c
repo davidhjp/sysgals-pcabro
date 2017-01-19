@@ -2,7 +2,7 @@
 
 #define SIZE 40
 static int b[SIZE];
-static int* hp = 0;
+static int* hp = b;
 
 void push(int i) {
 	if(hp - b < SIZE) {

@@ -2,6 +2,7 @@ reaction FIFO(:input int signal add, output int signal get, output int signal q,
 		output signal empty, output signal full){
 		cfv f,e;
 		loop{
+			{+sgl_SetCFV(e, FALSE); sgl_SetCFV(f, FALSE);+}
 			abort(get){
 				abort(add){
 					{+ 
@@ -9,7 +10,7 @@ reaction FIFO(:input int signal add, output int signal get, output int signal q,
 							sgl_SetCFV(e, TRUE);
 						} else if (isFull() > 0) {
 							sgl_SetCFV(f, TRUE);
-						}
+						} 
 					+}
 					if(f) {
 						sustain full;
@@ -52,7 +53,7 @@ Cabro(input signal A,B,R; output signal O; input int channel C2;)->{
 			receive C2;
 			{+
 				int i = *(int*)sgl_GetChanVal(C2);
-				printf("Received : %d\n", i);
+				printf("========== Received : %d ==========\n", i);
 			+}
 		}
 	}
@@ -76,6 +77,7 @@ Buffer(input int channel C1; output int channel C2;)->{
 	FIFO(:add,get,q,empty,full)
 	||
 	{
+		pause;
 		loop{
 			abort(immediate full){
 				await(!empty);
@@ -83,6 +85,7 @@ Buffer(input int channel C1; output int channel C2;)->{
 				await(q);
 				{+ 
 					int i = *(int*)sgl_GetSigVal(q);
+					printf("poped %d\n",i);
 					sgl_SetChanVal(C2, &i); 
 				+}
 				send C2;
@@ -92,6 +95,3 @@ Buffer(input int channel C1; output int channel C2;)->{
 	}
 }
 
-// Pabro(input signal A,B,R; output signal O; input int channel C2;)->{
-
-// }
