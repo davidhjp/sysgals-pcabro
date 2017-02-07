@@ -1,0 +1,40 @@
+Pabro(input signal A,B,R; output signal O; output int queue[5] C1;)->{
+	loop{
+		abort(R){
+			{await(A);}||{await(B);}
+			{+
+				int i = get_next();
+				sgl_PutQ(C1, &i);
+			+}
+			emit O;
+			qsend C1;
+			halt;
+		}
+	}
+}
+
+Cabro(input signal A,B,R; output signal O; input int queue[5] C2;)->{
+	loop{
+		abort(R){
+			{await(A);}||{await(B);}
+			qreceive C2;
+			{+
+				int i = *(int*)sgl_GetQ(C2);
+				printf("========== Received : %d ==========\n", i);
+			+}
+		}
+	}
+}
+
+Buffer(input int queue[5] C1; output int queue[5] C2;)->{
+	loop{
+		qreceive C1;
+		{+
+			int i = *(int*)sgl_GetQ(C1);
+			sgl_PutQ(C2, &i);
+		+}
+		qsend C2;
+		pause;
+	}
+}
+
